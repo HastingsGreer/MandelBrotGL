@@ -1,10 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+import itertools
 from mandelmakers import getcounts, getcounts2
 import clmandel
 
 cl = clmandel.CL("mandel.cl")
+
 
 class Settings:
     def __init__(self, depth, scale, dim, center):
@@ -12,6 +13,11 @@ class Settings:
         self.scale = scale
         self.dim = dim
         self.center = center
+        
+        self.methods = itertools.cycle((getcounts, getcounts2, cl.getcounts))
+        self.changemethod()
+    def changemethod(self):
+        self.method = self.methods.next()
 
 def main():
     xmin = -2
@@ -56,6 +62,9 @@ def onkey(event, ax, settings):
         settings.dim = int(settings.dim / 2)
     elif key == "w":
         settings.scale = settings.scale * 2
+    elif key == "r":
+        settings.changemethod()
+        print settings.method
     else:
         return
     render(ax, settings)
@@ -67,7 +76,7 @@ def render(ax, settings):
     xmax = settings.center[0] + settings.scale
     ymin = settings.center[1] - settings.scale
     ymax = settings.center[1] + settings.scale
-    ax.imshow(cl.getcounts(xmin, xmax, ymin, ymax, settings), extent = [xmin, xmax, ymax, ymin])
+    ax.imshow(settings.method(xmin, xmax, ymin, ymax, settings), extent = [xmin, xmax, ymax, ymin])
     
     ax.figure.canvas.draw()
     
