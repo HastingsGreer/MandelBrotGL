@@ -7,7 +7,7 @@ def getcounts(xmin, xmax, ymin, ymax, settings):
     complex plane, by calling a C script and interpreting stdout as a series of integers
     output is a numpy array reshaped into a dim*dim square"""
      
-    p = Popen(["/home/hastings/cfuckery/speedtest/a.out", repr(xmin), 
+    p = Popen(["./a.out", repr(xmin), 
         repr(xmax), repr(ymin),repr(ymax), str(settings.dim), str(settings.depth)], stdout=subprocess.PIPE)
         
     print repr(xmin), repr(xmax), repr(ymin),repr(ymax), str(settings.dim), str(settings.depth)
