@@ -20,6 +20,7 @@ class Settings:
         self.method = self.methods.next()
 
 def main():
+    #initial settings
     xmin = -2
     xmax = 2
     ymin = -2
