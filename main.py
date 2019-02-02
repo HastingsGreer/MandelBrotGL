@@ -5,7 +5,7 @@ from mandelmakers import getcounts2
 import clmandel
 
 cl = clmandel.CL("mandel.cl")
-
+import mpmath
 
 class Settings:
     def __init__(self, depth, scale, dim, center):
@@ -21,23 +21,23 @@ class Settings:
 
 def main():
     #initial settings
-    xmin = -2
-    xmax = 2
-    ymin = -2
-    ymax = 2
+    xmin = mpmath.mpf(-2)
+    xmax = mpmath.mpf(2)
+    ymin = mpmath.mpf(-2)
+    ymax = mpmath.mpf(2)
      
-    depth = 60   
-    scale = 2
+    depth = mpmath.mpf(60)   
+    scale = mpmath.mpf(2)
     dim = 600
     settings = Settings(depth, scale, dim, (0, 0))  
                                             # the settings object is used to keep track of
                                             # rendering settings as the click-generated 
                                             # callbacks change the view window
         
-    counts = getcounts2(xmin, xmax, ymin, ymax, settings)
+    counts = cl.getcounts(xmin, xmax, ymin, ymax, settings)
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    picture = ax.imshow(counts, extent = [xmin, xmax, ymax, ymin], interpolation = 'nearest')
+    picture = ax.imshow(counts, extent = [-1, 1, -1, 1], interpolation = 'nearest')
     colorbar = fig.colorbar(picture, ax = ax)
     cid = fig.canvas.mpl_connect('button_press_event', lambda e: onclick(e, ax, colorbar, settings))
     cid = fig.canvas.mpl_connect('key_press_event', lambda e: onkey(e, ax, colorbar, settings))
@@ -45,8 +45,9 @@ def main():
     
     
 def onclick(event, ax, colorbar, settings):
-    settings.scale *= .5                  #zoom in by a factor of two with every click
-    settings.center = (event.xdata, event.ydata)
+    settings.center = (event.xdata * settings.scale + settings.center[0], -event.ydata * settings.scale + settings.center[1])
+    settings.scale *= .15                  #zoom in by a factor of two with every click
+    
     render(ax, colorbar, settings)
     
     
@@ -64,7 +65,7 @@ def onkey(event, ax, colorbar, settings):
     elif key == "w":
         settings.scale = settings.scale * 2
     elif key == "r":
-        settings.changemethod()
+        #settings.changemethod()
         print(settings.method)
     else:
         return
@@ -77,7 +78,7 @@ def render(ax, colorbar, settings):
     xmax = settings.center[0] + settings.scale
     ymin = settings.center[1] - settings.scale
     ymax = settings.center[1] + settings.scale
-    cax = ax.imshow(settings.method(xmin, xmax, ymin, ymax, settings), extent = [xmin, xmax, ymax, ymin])
+    cax = ax.imshow(settings.method(xmin, xmax, ymin, ymax, settings), extent = [-1, 1, -1, 1])
     colorbar.on_mappable_changed(cax)
     ax.figure.canvas.draw()
     
