@@ -11,7 +11,7 @@ class CL:
         #read in the OpenCL source file as a string
         f = open(filename, 'r')
         fstr = "".join(f.readlines())
-        print fstr
+        print(fstr)
         #create the program
         self.program = cl.Program(self.ctx, fstr).build()
 
@@ -38,7 +38,7 @@ class CL:
     def execute(self, settings):
         self.program.mandel(self.queue, (self.c_real.shape[0],), None, self.real_buf, self.imag_buf, self.depth_buf, self.dest_buf)
         counts = np.zeros(settings.dim**2, dtype = np.int32)
-        cl.enqueue_read_buffer(self.queue, self.dest_buf, counts).wait()
+        cl._enqueue_read_buffer(self.queue, self.dest_buf, counts).wait()
         return counts.reshape([settings.dim, settings.dim])
         
     def getcounts(self, xmin, xmax, ymin, ymax, settings):

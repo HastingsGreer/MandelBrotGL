@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import itertools
-from mandelmakers import getcounts, getcounts2
+from mandelmakers import getcounts2
 import clmandel
 
 cl = clmandel.CL("mandel.cl")
@@ -14,10 +14,10 @@ class Settings:
         self.dim = dim
         self.center = center
         
-        self.methods = itertools.cycle(( cl.getcounts, getcounts, getcounts2))
+        self.methods = itertools.cycle(( cl.getcounts, getcounts2))
         self.changemethod()
     def changemethod(self):
-        self.method = self.methods.next()
+        self.method = next(self.methods)
 
 def main():
     #initial settings
@@ -34,7 +34,7 @@ def main():
                                             # rendering settings as the click-generated 
                                             # callbacks change the view window
         
-    counts = getcounts(xmin, xmax, ymin, ymax, settings)
+    counts = getcounts2(xmin, xmax, ymin, ymax, settings)
     fig = plt.figure()
     ax = fig.add_subplot(111)
     picture = ax.imshow(counts, extent = [xmin, xmax, ymax, ymin], interpolation = 'nearest')
@@ -53,9 +53,9 @@ def onclick(event, ax, colorbar, settings):
 def onkey(event, ax, colorbar, settings):
     key = event.key
     
-    if key == "q":
+    if key == "1":
         settings.depth = int(settings.depth * 2)
-    elif key == "a":
+    elif key == "2":
         settings.depth = int(settings.depth / 2)
     elif key == "e":
         settings.dim = int(settings.dim * 2)
@@ -65,13 +65,13 @@ def onkey(event, ax, colorbar, settings):
         settings.scale = settings.scale * 2
     elif key == "r":
         settings.changemethod()
-        print settings.method
+        print(settings.method)
     else:
         return
     render(ax, colorbar, settings)
 
 def render(ax, colorbar, settings):
-    print str(settings.dim), str(settings.depth)
+    print(str(settings.dim), str(settings.depth))
     ax.clear()
     xmin = settings.center[0] - settings.scale
     xmax = settings.center[0] + settings.scale
